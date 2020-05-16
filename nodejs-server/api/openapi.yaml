@@ -1,0 +1,159 @@
+openapi: 3.0.0
+info:
+  title: Simple artists API
+  description: Simple API to illustrate OpenAPI concepts
+  version: 1.0.0
+servers:
+- url: https://example.io/v1
+  description: Test server
+security:
+- BasicAuth: []
+paths:
+  /artists:
+    summary: Artists endpoint
+    description: This is the artists enpoint
+    get:
+      summary: Get list of artists
+      description: Returns a list of artists
+      operationId: artistsGET
+      parameters:
+      - name: offset
+        in: query
+        description: page number
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        description: amount of information on the page
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: Successful request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArtistsArray'
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-swagger-router-controller: Default
+    post:
+      summary: Create an artist
+      description: Post a new artist to the service
+      operationId: artistsPOST
+      requestBody:
+        description: Request body for creating new artist
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Artist'
+      responses:
+        "200":
+          description: Success creating new artist
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-swagger-router-controller: Default
+  /artists/{username}:
+    summary: Artist endpoint by username
+    description: This is the artist by username endpoint
+    get:
+      summary: Get artist
+      description: Get artist based on username
+      operationId: artistsUsernameGET
+      parameters:
+      - name: username
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Successful request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Artist'
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-swagger-router-controller: Default
+components:
+  schemas:
+    Artist:
+      required:
+      - username
+      type: object
+      properties:
+        artistName:
+          type: string
+        artistGenre:
+          type: string
+        albumsRecorded:
+          type: integer
+        username:
+          type: string
+      example:
+        albumsRecorded: 0
+        artistName: artistName
+        artistGenre: artistGenre
+        username: username
+    ArtistsArray:
+      type: array
+      description: Schema response artists
+      items:
+        $ref: '#/components/schemas/Artist'
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+      description: Schema response invalid request
+  responses:
+    InvalidRequest:
+      description: Invalid request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  parameters:
+    PageOffset:
+      name: offset
+      in: query
+      description: page number
+      required: false
+      style: form
+      explode: true
+      schema:
+        type: integer
+    PageLimit:
+      name: limit
+      in: query
+      description: amount of information on the page
+      required: false
+      style: form
+      explode: true
+      schema:
+        type: integer
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
